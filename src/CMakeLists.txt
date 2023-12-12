@@ -12,15 +12,16 @@ qt_add_executable(note++
     main.cpp
 )
 
-# add_library(Windows Windows/tic-tac-toeWindow.cpp Windows/tic-tac-toeWindow.h)
-# add_library(Logic Logic/Game.cpp Logic/Game.h)
-
-# target_link_libraries(note++ PRIVATE Windows)
-# target_link_libraries(Windows PRIVATE Logic)
+add_library(Views views/MainWindow.h views/MainWindow.cpp)
+add_library(Models models/file.h models/file.cpp models/errorFile.h)
 
 target_link_libraries(note++ PRIVATE Qt6::Widgets)
-# target_link_libraries(Logic PRIVATE Qt6::Widgets)
-# target_link_libraries(Windows PRIVATE Qt6::Widgets)
+target_link_libraries(Views PRIVATE Qt6::Widgets)
+
+target_link_libraries(note++ PRIVATE Views)
+target_link_libraries(Models PRIVATE Views)
+target_link_libraries(Views PRIVATE Models)
+
 
 set_target_properties(note++ PROPERTIES
 	WIN32_EXECUTABLE ON

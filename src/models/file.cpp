@@ -1,7 +1,5 @@
 #include "file.h"
 
-#include <utility>
-
 FileObject::FileObject(std::string  pathToFile): pathToFile(std::move(pathToFile)) {}
 
 std::string FileObject::read() {
@@ -13,8 +11,8 @@ std::string FileObject::read() {
 	std::fstream file(pathToFile);
 
 	if (file.is_open()) {
-		while (file >> line) {
-			ret += line + '\n';
+		while (std::getline(file, line, '\n')) {
+			ret += line + "\n";
 		}
 		file.close();
 	} else {

@@ -13,6 +13,7 @@ void MainWindow::createUI() {
 
 	QTextEdit* editor = new QTextEdit(this);
 	editor->setWordWrapMode(QTextOption::NoWrap);
+	editor->setAcceptRichText(false);
 
 	windowTabs->addTab(editor, QString("untitled"));
 	windowTabs->setTabsClosable(true);
@@ -76,6 +77,7 @@ void MainWindow::newFile() {
 	qDebug() << "newFile";
 	QTextEdit* editor = new QTextEdit(this);
 	editor->setWordWrapMode(QTextOption::NoWrap);
+	editor->setAcceptRichText(false);
 
 	int tab = windowTabs->addTab(editor, QString("untitled"));
 	windowTabs->setCurrentIndex(tab);
@@ -96,7 +98,10 @@ void MainWindow::open() {
 	} catch (FileException ex) {
 		statusBar()->showMessage(QString::fromStdString(ex.getMessage()));
 	}
-	auto* editor = new QTextEdit(str, this);
+	auto* editor = new QTextEdit(this);
+	editor->setWordWrapMode(QTextOption::NoWrap);
+	editor->setAcceptRichText(false);
+	editor->setPlainText(str);
 	str =  QString::fromStdString(file.getName());
 	int tab = windowTabs->addTab(editor, str);
 	windowTabs->setCurrentIndex(tab);
@@ -112,16 +117,17 @@ void MainWindow::save() {
 	try {
 		if (editorToFileMap.contains(editor)) {
 			auto file = editorToFileMap[editor];
-			file.save(editor->toMarkdown().toStdString());
-			std::cout << editor->toMarkdown().toStdString();
+			file.save(editor->toPlainText().toStdString());
+			std::cout << editor->toPlainText().toStdString();
 			windowTabs->setTabText(windowTabs->indexOf(editor), QString::fromStdString(file.getName()));
 		} else {
 			QString filename = QFileDialog::getSaveFileName(this, tr("Save File"), "", "All files (*.*)");
 			auto file = FileObject(filename.toStdString());
 			editorToFileMap[editor] = file;
-			file.save(editor->toMarkdown().toStdString());
+			file.save(editor->toPlainText().toStdString());
 			windowTabs->setTabText(windowTabs->indexOf(editor), QString::fromStdString(file.getName()));
 		}
+		statusBar()->showMessage(tr("Saved"));
 	} catch (FileException ex) {
 		statusBar()->showMessage(QString::fromStdString(ex.getMessage()));
 	}	
@@ -157,6 +163,7 @@ void MainWindow::closeTab(int index) {
 	if (windowTabs->count() == 0) {
 		QTextEdit* editor = new QTextEdit(this);
 		editor->setWordWrapMode(QTextOption::NoWrap);
+		editor->setAcceptRichText(false);
 
 		windowTabs->addTab(editor, QString("untitled"));
 	}
